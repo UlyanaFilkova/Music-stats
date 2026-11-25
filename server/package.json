@@ -5,7 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tsx --test music-api.test.ts",
+    "check": "tsc --noEmit",
+    "probe": "tsx test-music.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +19,6 @@
   },
   "dependencies": {
     "dotenv": "^18.0.10",
-    "node-wreq": "^3.2.2",
-    "yamd2": "^1.6.4"
+    "node-wreq": "^3.2.2"
   }
 }
