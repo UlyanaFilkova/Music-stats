@@ -1,6 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,5 +14,10 @@
     "@types/node": "^26.6.10",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "node-wreq": "^3.2.2",
+    "yamd2": "^1.6.4"
   }
 }
