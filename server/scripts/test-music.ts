@@ -1,53 +1,20 @@
 import 'dotenv/config';
-import { createMusicApi } from './music-api.js';
-
-// --- Типы для ответов API ---
-
-interface YandexTrackShort {
-    id: string;
-    albumId: string;
-    timestamp: string;
-}
-
-interface YandexLikesResponse {
-    library: {
-        tracks: YandexTrackShort[];
-    };
-}
-
-interface YandexTrack {
-    id: string;
-    title: string;
-    artists: { name: string }[];
-}
-
-interface YandexAlbumResponse {
-    title: string;
-    year: number;
-    genre: string;
-}
-
-interface YandexSimilarResponse {
-    similarTracks?: { title: string }[];
-}
-
-// --- Основная функция ---
+import { yandexFetch } from '@/api/client.js';
+import type {
+    YandexAlbumResponse,
+    YandexLikesResponse,
+    YandexSimilarResponse,
+    YandexTrack,
+} from '@/api/types.js';
 
 async function test() {
-    const token = process.env.YM_TOKEN;
-    const uid = process.env.YM_UID;
 
-    if (!token || !uid) {
-        console.error('Токен или UID не найдены в .env');
-        process.exitCode = 1;
-        return;
-    }
-
-    const get = createMusicApi(token);
+    const uid = Number(process.env.YM_UID);
 
     try {
         // 1. Получаем лайкнутые треки
-        const data = await get<YandexLikesResponse>(`/users/${encodeURIComponent(uid)}/likes/tracks`);
+        const data = await yandexFetch(`/users/${encodeURIComponent(uid)}/likes/tracks`) as YandexLikesResponse;
+
         const tracks = data.library?.tracks || [];
         console.log(`Лайкнутых треков: ${tracks.length}`);
 
@@ -59,7 +26,7 @@ async function test() {
         const ids = tracks.slice(0, 5).map((t) => t.id).join(',');
 
         if (ids) {
-            const fullTracks = await get<YandexTrack[]>(`/tracks?trackIds=${encodeURIComponent(ids)}`);
+            const fullTracks = await yandexFetch(`/tracks?trackIds=${encodeURIComponent(ids)}`) as YandexTrack[];
 
             console.log('\nПолная информация о первых 5 треках:');
             fullTracks.forEach((track, i) => {
@@ -72,7 +39,7 @@ async function test() {
             const firstAlbumId = tracks[0]?.albumId;
             if (firstAlbumId) {
                 console.log('\n--- Информация об альбоме первого трека ---');
-                const albumData = await get<YandexAlbumResponse>(`/albums/${encodeURIComponent(firstAlbumId)}`);
+                const albumData = await yandexFetch(`/albums/${encodeURIComponent(firstAlbumId)}`) as YandexAlbumResponse;
                 console.log('Альбом:', albumData.title);
                 console.log('Год:', albumData.year);
                 console.log('Жанр:', albumData.genre);
@@ -82,7 +49,7 @@ async function test() {
             const firstTrackId = tracks[0]?.id;
             if (firstTrackId) {
                 console.log('\n--- Похожие треки для первого трека ---');
-                const similarData = await get<YandexSimilarResponse>(`/tracks/${encodeURIComponent(firstTrackId)}/similar`);
+                const similarData = await yandexFetch(`/tracks/${encodeURIComponent(firstTrackId)}/similar`) as YandexSimilarResponse;
                 const similar = similarData.similarTracks?.slice(0, 3) || [];
                 similar.forEach((t, i) => console.log(`${i + 1}. ${t.title}`));
             }
@@ -91,9 +58,9 @@ async function test() {
 
         // История не зависит от наличия лайков. Сохраняем ответ без предположений
         // о количестве событий и времени прослушивания: это сгруппированная история.
-        const history = await get<unknown>('/music-history?fullModelsCount=5');
+        const history = await yandexFetch('/music-history?fullModelsCount=5');
         console.log('\nИстория получена:');
-        console.log(JSON.stringify(history, null, 2).slice(0, 2000));
+        console.log(JSON.stringify(history, null, 2));
 
     } catch (error: unknown) {
         console.error('Ошибка:', error instanceof Error ? error.message : 'Неизвестная ошибка');
