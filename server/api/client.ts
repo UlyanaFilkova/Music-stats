@@ -41,5 +41,5 @@ export async function yandexFetch(path: string, options?: { auth?: boolean }): P
         throw new Error(`GET ${path}: API вернул ошибку: ${JSON.stringify((data as any).error)}`);
     }
 
-    return data
+    return 'result' in data ? data.result : data;
 }

@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { yandexFetch } from '@/api/client.js';
+import { fetchLikes } from '@/api/likes.js';
 import type {
     YandexAlbumResponse,
     YandexLikesResponse,
@@ -9,13 +10,9 @@ import type {
 
 async function test() {
 
-    const uid = Number(process.env.YM_UID);
-
     try {
         // 1. Получаем лайкнутые треки
-        const data = await yandexFetch(`/users/${encodeURIComponent(uid)}/likes/tracks`) as YandexLikesResponse;
-
-        const tracks = data.library?.tracks || [];
+        const tracks = await fetchLikes();
         console.log(`Лайкнутых треков: ${tracks.length}`);
 
         tracks.slice(0, 5).forEach((item, i) => {
