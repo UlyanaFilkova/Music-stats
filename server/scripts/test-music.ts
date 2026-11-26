@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import { yandexFetch } from '@/api/client.js';
 import { fetchLikes } from '@/api/likes.js';
+import { fetchHistory } from '@/api/history.js';
 import type {
     YandexAlbumResponse,
-    YandexLikesResponse,
     YandexSimilarResponse,
     YandexTrack,
 } from '@/api/types.js';
@@ -55,7 +55,7 @@ async function test() {
 
         // История не зависит от наличия лайков. Сохраняем ответ без предположений
         // о количестве событий и времени прослушивания: это сгруппированная история.
-        const history = await yandexFetch('/music-history?fullModelsCount=5');
+        const history = await fetchHistory();
         console.log('\nИстория получена:');
         console.log(JSON.stringify(history, null, 2));
 
