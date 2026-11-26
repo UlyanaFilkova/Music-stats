@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { yandexFetch } from '@/api/client.js';
 import { fetchLikes } from '@/api/likes.js';
 import { fetchHistory } from '@/api/history.js';
+import { saveToFile } from '@/storage/fileStorage.js';
 import type {
     YandexAlbumResponse,
     YandexSimilarResponse,
@@ -13,6 +14,7 @@ async function test() {
     try {
         // 1. Получаем лайкнутые треки
         const tracks = await fetchLikes();
+        await saveToFile('data/likes.json', tracks);
         console.log(`Лайкнутых треков: ${tracks.length}`);
 
         tracks.slice(0, 5).forEach((item, i) => {
@@ -56,6 +58,7 @@ async function test() {
         // История не зависит от наличия лайков. Сохраняем ответ без предположений
         // о количестве событий и времени прослушивания: это сгруппированная история.
         const history = await fetchHistory();
+        await saveToFile('data/history.json', history);
         console.log('\nИстория получена:');
         console.log(JSON.stringify(history, null, 2));
 
