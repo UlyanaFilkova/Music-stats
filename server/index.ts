@@ -3,7 +3,7 @@ import { HOST, PORT } from '@/config.js'
 import { fetchLikes } from '@/api/likes.js'
 import { fetchHistory } from '@/api/history.js'
 import { loadFromFile, saveToFile } from '@/storage/fileStorage.js'
-import { type YandexTrackShort } from '@/api/types.js'
+import { type YandexTrackShort, type YandexHistoryResponse } from '@/api/types.js'
 
 const app = express()
 
@@ -26,7 +26,14 @@ app.get('/api/likes', async (_req, res) => {
 
 app.get('/api/history', async (_req, res) => {
   try {
+    const historyFromFile = await loadFromFile<YandexHistoryResponse>('data/history.json')
+    if (historyFromFile !== null) {
+      res.json(historyFromFile)
+      return
+    }
+
     const history = await fetchHistory()
+    await saveToFile('data/history.json', history)
     res.json(history)
   } catch (error: unknown) {
     console.error('Не удалось получить историю:', error)
