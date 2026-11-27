@@ -4,7 +4,7 @@ import { fetchLikes } from '@/api/likes.js'
 
 const app = express()
 
-app.get('/likes', async (_req, res) => {
+app.get('/api/likes', async (_req, res) => {
   try {
     const tracks = await fetchLikes()
     res.json(tracks)
